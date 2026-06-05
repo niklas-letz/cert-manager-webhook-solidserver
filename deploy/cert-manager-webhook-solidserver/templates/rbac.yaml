@@ -1,0 +1,130 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "solidserver-webhook.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app: {{ include "solidserver-webhook.name" . }}
+    chart: {{ include "solidserver-webhook.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+---
+# Grant the webhook permission to read the ConfigMap containing the Kubernetes
+# apiserver's requestheader-ca-certificate.
+# This ConfigMap is automatically created by the Kubernetes apiserver.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "solidserver-webhook.fullname" . }}:webhook-authentication-reader
+  namespace: kube-system
+  labels:
+    app: {{ include "solidserver-webhook.name" . }}
+    chart: {{ include "solidserver-webhook.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: extension-apiserver-authentication-reader
+subjects:
+  - apiGroup: ""
+    kind: ServiceAccount
+    name: {{ include "solidserver-webhook.fullname" . }}
+    namespace: {{ .Release.Namespace }}
+---
+# apiserver gets the auth-delegator role to delegate auth decisions to
+# the core apiserver
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "solidserver-webhook.fullname" . }}:auth-delegator
+  labels:
+    app: {{ include "solidserver-webhook.name" . }}
+    chart: {{ include "solidserver-webhook.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:auth-delegator
+subjects:
+  - apiGroup: ""
+    kind: ServiceAccount
+    name: {{ include "solidserver-webhook.fullname" . }}
+    namespace: {{ .Release.Namespace }}
+---
+# Grant the webhook permission to read secrets cluster-wide.
+# This is needed because cert-manager issuers and their referenced
+# credential secrets can be in any namespace, not just the webhook's.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "solidserver-webhook.fullname" . }}:secret-reader
+  labels:
+    app: {{ include "solidserver-webhook.name" . }}
+    chart: {{ include "solidserver-webhook.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "solidserver-webhook.fullname" . }}:secret-reader
+  labels:
+    app: {{ include "solidserver-webhook.name" . }}
+    chart: {{ include "solidserver-webhook.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "solidserver-webhook.fullname" . }}:secret-reader
+subjects:
+  - apiGroup: ""
+    kind: ServiceAccount
+    name: {{ include "solidserver-webhook.fullname" . }}
+    namespace: {{ .Release.Namespace }}
+---
+# Grant cert-manager permission to validate using our apiserver
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "solidserver-webhook.fullname" . }}:domain-solver
+  labels:
+    app: {{ include "solidserver-webhook.name" . }}
+    chart: {{ include "solidserver-webhook.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+rules:
+  - apiGroups:
+      - {{ .Values.groupName }}
+    resources:
+      - '*'
+    verbs:
+      - 'create'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "solidserver-webhook.fullname" . }}:domain-solver
+  labels:
+    app: {{ include "solidserver-webhook.name" . }}
+    chart: {{ include "solidserver-webhook.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "solidserver-webhook.fullname" . }}:domain-solver
+subjects:
+  - apiGroup: ""
+    kind: ServiceAccount
+    name: {{ .Values.certManager.serviceAccountName }}
+    namespace: {{ .Values.certManager.namespace }}

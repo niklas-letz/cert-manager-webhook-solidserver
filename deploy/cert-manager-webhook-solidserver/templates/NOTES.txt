@@ -1,0 +1,36 @@
+The cert-manager SOLIDserver webhook has been deployed.
+
+The webhook is serving at groupName: {{ .Values.groupName }}
+
+To use this webhook, create a ClusterIssuer or Issuer:
+
+  apiVersion: cert-manager.io/v1
+  kind: ClusterIssuer
+  metadata:
+    name: letsencrypt-staging
+  spec:
+    acme:
+      server: https://acme-staging-v02.api.letsencrypt.org/directory
+      email: <your-email>
+      privateKeySecretRef:
+        name: letsencrypt-staging
+      solvers:
+        - dns01:
+            webhook:
+              groupName: {{ .Values.groupName }}
+              solverName: solidserver
+              config:
+                host: <solidserver-host>
+                serverName: <dns-server-name>
+                usernameSecretRef:
+                  name: solidserver-credentials
+                  key: username
+                passwordSecretRef:
+                  name: solidserver-credentials
+                  key: password
+
+Check the webhook is healthy:
+
+  kubectl get pod -n {{ .Release.Namespace }} -l app={{ include "solidserver-webhook.name" . }}
+
+For more details, see: https://github.com/niklas-letz/cert-manager-webhook-solidserver

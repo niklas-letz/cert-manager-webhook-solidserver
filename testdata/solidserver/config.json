@@ -1,0 +1,6 @@
+{
+  "host": "sds.example.com",
+  "serverName": "dns.example.com",
+  "zoneName": "test.example.com"
+}
+  
