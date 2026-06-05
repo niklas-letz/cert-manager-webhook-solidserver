@@ -10,7 +10,7 @@ permissions:
   packages: write
 
 jobs:
-  build-and-push:
+  container:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -33,3 +33,18 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64
+
+  helm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/setup-helm@v4
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Package and push chart
+        run: |
+          helm package deploy/cert-manager-webhook-solidserver
+          helm push cert-manager-webhook-solidserver-*.tgz oci://ghcr.io/${{ github.repository_owner }}/charts
