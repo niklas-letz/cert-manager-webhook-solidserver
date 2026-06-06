@@ -19,6 +19,7 @@ permissions:
 
 jobs:
   validate-go:
+    name: Validate Go Code
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -36,6 +37,7 @@ jobs:
           version: latest
 
   helm:
+    name: Validate & Push Helm Chart
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -62,15 +64,13 @@ jobs:
           helm push .dist/*.tgz oci://ghcr.io/${{ github.repository_owner }}/charts
 
   container:
+    name: Build & Push Container Image
     needs: validate-go
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set up QEMU (Multi-arch support)
-        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

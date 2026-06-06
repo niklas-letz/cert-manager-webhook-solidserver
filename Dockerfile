@@ -1,4 +1,4 @@
-FROM golang:1.26-alpine3.23 AS build_deps
+FROM --platform=$BUILDPLATFORM golang:1.26-alpine3.23 AS build_deps
 
 RUN apk add --no-cache git
 
@@ -13,7 +13,10 @@ FROM build_deps AS build
 
 COPY . .
 
-RUN CGO_ENABLED=0 go build -o webhook -ldflags '-w -extldflags "-static"' .
+ARG TARGETOS
+ARG TARGETARCH
+
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o webhook -ldflags '-w -extldflags "-static"' .
 
 FROM alpine:3.23
 
