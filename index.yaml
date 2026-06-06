@@ -4,6 +4,30 @@ entries:
   - annotations:
       artifacthub.io/license: Apache-2.0
     apiVersion: v2
+    appVersion: 1.0.4
+    created: "2026-06-06T20:18:43.729626491Z"
+    description: A Helm chart for solving ACME DNS-01 challenges via the EfficientIP
+      SOLIDserver REST API
+    digest: 73c504a03378e4531001fc21d748cd125b9f86969b748750cdd42d9ff2fcb13d
+    home: https://github.com/niklas-letz/cert-manager-webhook-solidserver
+    icon: https://raw.githubusercontent.com/cert-manager/cert-manager/master/logo/logo-small.png
+    keywords:
+    - cert-manager
+    - solidserver
+    - letsencrypt
+    - tls
+    maintainers:
+    - name: Niklas Letz
+    name: cert-manager-webhook-solidserver
+    sources:
+    - https://github.com/niklas-letz/cert-manager-webhook-solidserver
+    - https://github.com/cert-manager/webhook-example
+    urls:
+    - https://github.com/niklas-letz/cert-manager-webhook-solidserver/releases/download/cert-manager-webhook-solidserver-1.0.4/cert-manager-webhook-solidserver-1.0.4.tgz
+    version: 1.0.4
+  - annotations:
+      artifacthub.io/license: Apache-2.0
+    apiVersion: v2
     appVersion: 1.0.3
     created: "2026-06-06T17:37:18.772843082Z"
     description: A Helm chart for solving ACME DNS-01 challenges via the EfficientIP
@@ -73,4 +97,4 @@ entries:
     urls:
     - https://github.com/niklas-letz/cert-manager-webhook-solidserver/releases/download/cert-manager-webhook-solidserver-1.0.1/cert-manager-webhook-solidserver-1.0.1.tgz
     version: 1.0.1
-generated: "2026-06-06T17:37:18.772856066Z"
+generated: "2026-06-06T20:18:43.72972704Z"
