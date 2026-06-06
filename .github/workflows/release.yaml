@@ -112,6 +112,12 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+      - name: Generate values.schema.json automatically
+        run: |
+          docker run --rm \
+            -v "deploy/cert-manager-webhook-solidserver:/home/helm-schema" \
+            ghcr.io/dadav/helm-schema:latest
+      
       - name: Sync Chart.yaml with Git Tag
         run: |
           VERSION=${GITHUB_REF_NAME#v}
