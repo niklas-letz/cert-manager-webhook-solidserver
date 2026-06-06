@@ -49,7 +49,6 @@ jobs:
       - name: Generate values.schema.json automatically
         run: |
           docker run --rm \
-            -u "$(id -u):$(id -g)" \
             -v "$(pwd)/deploy/cert-manager-webhook-solidserver:/home/helm-schema" \
             ghcr.io/dadav/helm-schema:latest
           
