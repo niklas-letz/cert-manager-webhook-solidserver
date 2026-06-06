@@ -8,7 +8,7 @@ API documentation: [solidserver-go-client](https://github.com/EfficientIP-Labs/s
 
 ## Requirements
 
-- [Go](https://golang.org/) >= 1.25.0
+- [Go](https://golang.org/) >= 1.26.0
 - [Helm](https://helm.sh/) >= v3.0.0
 - [Kubernetes](https://kubernetes.io/) >= v1.35.0
 - [cert-manager](https://cert-manager.io/) >= 1.20.0
@@ -26,8 +26,10 @@ The Helm chart is published as an OCI artifact on GHCR. You can install it from 
 #### From OCI registry (GHCR)
 
 ```bash
-helm repo add cert-manager-webhook-solidserver https://niklas-letz.github.io/cert-manager-webhook-solidserver
-helm install --namespace cert-manager solidserver-webhook cert-manager-webhook-soliders/cert-manager-webhook-solidserver
+helm install solidserver-webhook \
+  oci://ghcr.io/niklas-letz/charts/cert-manager-webhook-solidserver \
+  --version <version> \
+  --namespace cert-manager
 ```
 
 #### From local checkout
