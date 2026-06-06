@@ -118,8 +118,6 @@ spec:
 
 ### Running the test suite
 
-All DNS providers **must** pass the DNS01 provider conformance testing suite.
-
 See [testdata/solidserver/README.md](testdata/solidserver/README.md) for setup instructions.
 
 ```bash
