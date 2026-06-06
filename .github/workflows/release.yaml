@@ -49,7 +49,7 @@ jobs:
       - name: Generate helm-docs automatically
         run: |
           docker run --rm \
-            -v "deploy/cert-manager-webhook-solidserver:/helm-docs" \
+            -v "${{ github.workspace }}/deploy/cert-manager-webhook-solidserver:/helm-docs" \
             jnorwood/helm-docs:latest
 
       - name: Lint Helm chart
@@ -122,13 +122,13 @@ jobs:
         run: |
           docker run --rm \
             -u "$(id -u):$(id -g)" \
-            -v "deploy/cert-manager-webhook-solidserver:/home/helm-schema" \
+            -v "$(pwd)/deploy/cert-manager-webhook-solidserver:/home/helm-schema" \
             ghcr.io/dadav/helm-schema:latest
       
       - name: Generate helm-docs automatically
         run: |
           docker run --rm \
-            -v "deploy/cert-manager-webhook-solidserver:/helm-docs" \
+            -v "${{ github.workspace }}/deploy/cert-manager-webhook-solidserver:/helm-docs" \
             jnorwood/helm-docs:latest
 
       - name: Sync Chart.yaml with Git Tag
