@@ -115,7 +115,7 @@ jobs:
       - name: Generate values.schema.json automatically
         run: |
           docker run --rm \
-            -v "deploy/cert-manager-webhook-solidserver:/home/helm-schema" \
+            -v "${{ github.workspace }}/deploy/cert-manager-webhook-solidserver:/home/helm-schema" \
             ghcr.io/dadav/helm-schema:latest
       
       - name: Sync Chart.yaml with Git Tag
