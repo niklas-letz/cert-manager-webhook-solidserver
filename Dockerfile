@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM golang:1.26-alpine3.23 AS build_deps
+FROM --platform=$BUILDPLATFORM golang:1.26-alpine3.21 AS build_deps
 
 RUN apk add --no-cache git
 
@@ -18,7 +18,7 @@ ARG TARGETARCH
 
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o webhook -ldflags '-w -extldflags "-static"' .
 
-FROM alpine:3.23
+FROM alpine:3.21
 
 RUN apk add --no-cache ca-certificates
 
