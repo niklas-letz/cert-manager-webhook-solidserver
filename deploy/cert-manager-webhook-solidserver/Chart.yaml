@@ -1,8 +1,8 @@
 apiVersion: v2
 name: cert-manager-webhook-solidserver
 description: A Helm chart for solving ACME DNS-01 challenges via the EfficientIP SOLIDserver REST API
-version: 1.0.1
-appVersion: "1.0.1"
+version: 0.0.0-dev
+appVersion: "latest"
 home: https://github.com/niklas-letz/cert-manager-webhook-solidserver
 icon: https://raw.githubusercontent.com/cert-manager/cert-manager/master/logo/logo-small.png
 keywords:

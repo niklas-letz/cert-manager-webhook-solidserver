@@ -112,6 +112,15 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+      - name: Sync Chart.yaml with Git Tag
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          
+          yq eval ".version = \"${VERSION}\"" -i deploy/cert-manager-webhook-solidserver/Chart.yaml
+          yq eval ".appVersion = \"${VERSION}\"" -i deploy/cert-manager-webhook-solidserver/Chart.yaml
+          
+          echo "Chart version and appVersion temporarily updated to: ${VERSION}"
+
       - name: Log in to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u ${{ github.actor }} --password-stdin
 
@@ -119,6 +128,7 @@ jobs:
         uses: helm/chart-releaser-action@v1.7.0
         with:
           charts_dir: deploy
+          skip_packaging: false
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
@@ -126,4 +136,6 @@ jobs:
         run: |
           mkdir -p .dist
           helm package deploy/cert-manager-webhook-solidserver --destination .dist
-          helm push .dist/*.tgz oci://ghcr.io/${{ github.repository_owner }}/charts
+          
+          OWNER_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          helm push .dist/*.tgz oci://ghcr.io/${OWNER_LOWER}/charts
