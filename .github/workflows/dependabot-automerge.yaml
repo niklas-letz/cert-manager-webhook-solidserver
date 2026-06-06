@@ -18,8 +18,7 @@ jobs:
         id: metadata
         uses: dependabot/fetch-metadata@v3
 
-      - name: Enable auto-merge for non-Go dependencies
-        if: ${{ steps.metadata.outputs.package-ecosystem != 'gomod' }}
+      - name: Enable auto-merge for Dependabot PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh pr merge --auto --squash "${{ github.event.pull_request.html_url }}"

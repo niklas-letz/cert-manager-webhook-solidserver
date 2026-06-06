@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   go-lint:
-    name: Validate Go Code
+    name: Lint Go Code
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
