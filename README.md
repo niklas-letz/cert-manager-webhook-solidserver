@@ -21,6 +21,17 @@ Follow the [instructions](https://cert-manager.io/docs/installation/) in the cer
 
 ### Webhook
 
+The Helm chart is published as an OCI artifact on GHCR. You can install it from the registry or directly from a local checkout of this repository.
+
+#### From OCI registry (GHCR)
+
+```bash
+helm repo add cert-manager-webhook-solidserver https://niklas-letz.github.io/cert-manager-webhook-solidserver
+helm install --namespace cert-manager solidserver-webhook cert-manager-webhook-soliders/cert-manager-webhook-solidserver
+```
+
+#### From local checkout
+
 ```bash
 helm install --namespace cert-manager solidserver-webhook deploy/cert-manager-webhook-solidserver
 ```
