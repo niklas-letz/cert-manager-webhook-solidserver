@@ -128,14 +128,10 @@ jobs:
         uses: helm/chart-releaser-action@v1.7.0
         with:
           charts_dir: deploy
-          skip_packaging: false
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: Package and push Helm chart
+      - name: Push Helm chart to OCI
         run: |
-          mkdir -p .dist
-          helm package deploy/cert-manager-webhook-solidserver --destination .dist
-          
           OWNER_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-          helm push .dist/*.tgz oci://ghcr.io/${OWNER_LOWER}/charts
+          helm push .cr-release-packages/*.tgz oci://ghcr.io/${OWNER_LOWER}/charts
