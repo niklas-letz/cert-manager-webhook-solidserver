@@ -19,13 +19,12 @@ make clean             # rm -rf _test/ _out/
 
 ## CI workflow
 
-CI runs `golangci-lint` (via `golangci-lint-action@v9`) on every push/PR. The release workflow also builds multi-arch container images (`linux/amd64,linux/arm64`) and pushes both the image and Helm chart to GHCR.
+CI runs `golangci-lint` (via `golangci-lint-action@v9`) on every push/PR. The release workflow also builds multi-arch container images (`linux/amd64,linux/arm64`) and publishes the Helm chart to both GitHub Pages (traditional Helm repo) and GHCR (OCI).
 
-The Helm chart is published as an **OCI artifact**, not a traditional repo:
+Helm chart install via repo:
 ```bash
-helm install --namespace cert-manager solidserver-webhook \
-  oci://ghcr.io/niklas-letz/charts/cert-manager-webhook-solidserver \
-  --version <version>
+helm repo add solidserver https://niklas-letz.github.io/cert-manager-webhook-solidserver
+helm install --namespace cert-manager solidserver-webhook solidserver/cert-manager-webhook-solidserver --version <version>
 ```
 
 ## Dependency version lock
