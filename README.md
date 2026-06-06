@@ -27,7 +27,6 @@ The Helm chart is published on GitHub Pages and GHCR. You can install it via Hel
 
 ```bash
 helm repo add solidserver-webhook https://niklas-letz.github.io/cert-manager-webhook-solidserver
-helm repo update
 helm install solidserver-webhook solidserver-webhook/cert-manager-webhook-solidserver \
   --version <version> \
   --namespace cert-manager
