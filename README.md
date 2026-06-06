@@ -1,6 +1,6 @@
 # Cert-manager ACME webhook for EfficientIP SOLIDserver DDI
 
-This solver enables cert-manager to complete DNS01 challenges using the EfficientIP SOLIDserver DNS REST API.
+This webhook enables cert-manager to complete DNS01 challenges using the EfficientIP SOLIDserver DNS REST API.
 
 Based on [cert-manager/webhook-example](https://github.com/cert-manager/webhook-example).
 
