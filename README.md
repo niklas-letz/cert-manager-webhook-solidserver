@@ -74,7 +74,7 @@ spec:
     solvers:
       - dns01:
           webhook:
-            groupName: solidserver-webhook.niklasletz.com
+            groupName: acme.solidserver.niklasletz.dev
             solverName: solidserver
             config:
               host: sds.example.com
