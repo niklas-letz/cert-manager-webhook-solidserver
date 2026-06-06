@@ -1,15 +1,11 @@
-FROM golang:1.26-alpine3.23 AS build_deps
+FROM --platform=$BUILDPLATFORM golang:1.26-alpine3.23 AS builder
 
-RUN apk add --no-cache git
+RUN apk add --no-cache git ca-certificates
 
 WORKDIR /workspace
 
-COPY go.mod .
-COPY go.sum .
-
+COPY go.mod go.sum ./
 RUN go mod download
-
-FROM build_deps AS build
 
 COPY . .
 
@@ -20,8 +16,7 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o webhook -ldflags
 
 FROM alpine:3.23
 
-RUN apk add --no-cache ca-certificates
-
-COPY --from=build /workspace/webhook /usr/local/bin/webhook
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder /workspace/webhook /usr/local/bin/webhook
 
 ENTRYPOINT ["webhook"]
