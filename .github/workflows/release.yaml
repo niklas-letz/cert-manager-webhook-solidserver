@@ -135,3 +135,18 @@ jobs:
         run: |
           OWNER_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           helm push .cr-release-packages/*.tgz oci://ghcr.io/${OWNER_LOWER}/charts
+
+  deploy-docs:
+    name: Publish Static Pages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Deploy Static Assets to GH Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: static
+          branch: gh-pages
+          target-folder: /
+          clean: false
