@@ -91,7 +91,6 @@ jobs:
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          provenance: false
 
   helm-build-push:
     name: Build & Push Helm Chart
