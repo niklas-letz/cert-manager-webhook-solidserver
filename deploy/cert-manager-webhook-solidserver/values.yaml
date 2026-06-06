@@ -15,8 +15,9 @@ certManager:
   serviceAccountName: cert-manager
 
 image:
-  repository: mycompany/webhook-image
-  tag: latest
+  registry: ghcr.io
+  repository: niklas-letz/cert-manager-webhook-solidserver
+  tag: ""
   pullPolicy: IfNotPresent
 
 nameOverride: ""
