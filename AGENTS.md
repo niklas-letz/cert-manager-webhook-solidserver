@@ -7,28 +7,30 @@ A cert-manager ACME DNS01 webhook for EfficientIP SOLIDserver DDI. Registered as
 ## Commands
 
 ```bash
-make test              # conformance test suite (downloads etcd/apiserver/kubectl)
-make docker-build      # multi-stage Docker build (linux/amd64)
+go build ./...         # quick compile check
+go vet ./...           # static analysis
+
+make test              # conformance test suite (downloads etcd/apiserver/kubectl, ~200MB first run)
+make docker-build      # Docker build (linux/amd64 only, not multi-arch)
 make docker-build-fast # pre-compile locally, then Docker build with Dockerfile.fast
 make render-helm       # helm template -> _out/rendered-manifest.yaml
 make clean             # rm -rf _test/ _out/
 ```
 
-## Test prerequisites
+## CI workflow
 
-`main_test.go` is a **cert-manager conformance test**, not unit tests. It creates real DNS TXT records against a live SOLIDserver and verifies propagation.
+CI runs `golangci-lint` (via `golangci-lint-action@v9`) on every push/PR. The release workflow also builds multi-arch container images (`linux/amd64,linux/arm64`) and pushes both the image and Helm chart to GHCR.
 
-Required env vars (checked at runtime):
-- `SOLIDSERVER_USERNAME`
-- `SOLIDSERVER_PASSWORD`
+The Helm chart is published as an **OCI artifact**, not a traditional repo:
+```bash
+helm install --namespace cert-manager solidserver-webhook \
+  oci://ghcr.io/niklas-letz/charts/cert-manager-webhook-solidserver \
+  --version <version>
+```
 
-Optional:
-- `TEST_ZONE_NAME` — DNS zone for the resolved zone
-- `TEST_DNS_SERVER` — DNS server IP for propagation checks (port `:53` appended automatically)
+## Dependency version lock
 
-Test fixture config loads from `testdata/solidserver/config.json`. Set real connection details there before running.
-
-The test binary chain is: `test` → kubebuilder binaries (etcd, kube-apiserver, kubectl) → `setup-envtest@latest`. First run downloads ~200MB.
+**Do not bump `k8s.io/*` or `sigs.k8s.io/*`** beyond v0.35.x. `cert-manager v1.20.2` depends on `controller-runtime v0.23.1`, which is incompatible with `client-go v0.36.x` (`missing method HasSyncedChecker`). Dependabot is configured to ignore these packages (`.github/dependabot.yml:21-22`).
 
 ## Architecture
 
@@ -50,17 +52,24 @@ testdata/        — test fixture config.json
 
 Secret key defaults are `"username"` and `"password"` (overridable via the `.key` field on each ref).
 
-## Helm chart
+## Test prerequisites
 
-- Named template prefix: `solidserver-webhook` (not `example-webhook`)
-- Chart install: `helm install --namespace cert-manager solidserver-webhook deploy/cert-manager-webhook-solidserver`
-- `groupName` in `values.yaml` must match the `GroupName` env var and the `webhook.groupName` in ClusterIssuer configs
-- The chart auto-generates a full PKI chain (selfSigned CA → serving cert) — no external certs needed
-- RBAC grants `cert-manager`'s service account permission to `create` resources in the webhook's API group
+`main_test.go` is a **cert-manager conformance test**, not unit tests. It creates real DNS TXT records against a live SOLIDserver and verifies propagation.
+
+Required env vars:
+- `SOLIDSERVER_USERNAME`
+- `SOLIDSERVER_PASSWORD`
+
+Optional:
+- `TEST_ZONE_NAME` — DNS zone for the resolved zone
+- `TEST_DNS_SERVER` — DNS server IP for propagation checks (port `:53` appended automatically)
+
+Test fixture config loads from `testdata/solidserver/config.json`. Set real connection details there before running.
 
 ## Code conventions
 
-- Go 1.25.0, module `github.com/niklas-letz/cert-manager-webhook-solidserver`
-- Docker images target `linux/amd64` only (no multi-arch)
+- Go 1.26.0, module `github.com/niklas-letz/cert-manager-webhook-solidserver`
 - Alpine 3.23 base image in Dockerfiles
-- Lint/format: not configured (no linter or formatter in CI or Makefile)
+- Dockerfile uses `--platform=$BUILDPLATFORM` for the builder stage so Go cross-compiles arm64 natively on amd64 runners (avoids slow QEMU emulation)
+- No lint/format config in repo — golangci-lint runs with defaults in CI
+- CA certificates are copied from the builder image; the final image has no `apk add` steps
