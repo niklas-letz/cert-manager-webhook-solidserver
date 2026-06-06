@@ -46,13 +46,6 @@ jobs:
       - name: Set up Helm
         uses: azure/setup-helm@v5
 
-      - name: Generate helm-docs automatically
-        run: |
-          docker run --rm \
-            -v "${{ github.workspace }}/deploy/cert-manager-webhook-solidserver:/helm-docs" \
-            jnorwood/helm-docs:latest
-          ls -lah deploy/cert-manager-webhook-solidserver
-
       - name: Lint Helm chart
         run: helm lint deploy/cert-manager-webhook-solidserver
 
@@ -119,6 +112,15 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+      - name: Sync Chart.yaml with Git Tag
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          
+          yq eval ".version = \"${VERSION}\"" -i deploy/cert-manager-webhook-solidserver/Chart.yaml
+          yq eval ".appVersion = \"${VERSION}\"" -i deploy/cert-manager-webhook-solidserver/Chart.yaml
+          
+          echo "Chart version and appVersion temporarily updated to: ${VERSION}"
+
       - name: Generate values.schema.json automatically
         run: |
           docker run --rm \
@@ -131,15 +133,6 @@ jobs:
           docker run --rm \
             -v "${{ github.workspace }}/deploy/cert-manager-webhook-solidserver:/helm-docs" \
             jnorwood/helm-docs:latest
-
-      - name: Sync Chart.yaml with Git Tag
-        run: |
-          VERSION=${GITHUB_REF_NAME#v}
-          
-          yq eval ".version = \"${VERSION}\"" -i deploy/cert-manager-webhook-solidserver/Chart.yaml
-          yq eval ".appVersion = \"${VERSION}\"" -i deploy/cert-manager-webhook-solidserver/Chart.yaml
-          
-          echo "Chart version and appVersion temporarily updated to: ${VERSION}"
 
       - name: Log in to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u ${{ github.actor }} --password-stdin
