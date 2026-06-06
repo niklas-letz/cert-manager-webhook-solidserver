@@ -19,7 +19,7 @@ API documentation: [solidserver-go-client](https://github.com/EfficientIP-Labs/s
 
 Follow the [instructions](https://cert-manager.io/docs/installation/) in the cert-manager documentation to install it within your cluster.
 
-### Webhook test
+### Webhook
 
 The Helm chart is published as an OCI artifact on GHCR. You can install it from the registry or directly from a local checkout of this repository.
 
