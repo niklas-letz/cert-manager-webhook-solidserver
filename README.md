@@ -1,5 +1,9 @@
 # Cert-manager ACME webhook for EfficientIP SOLIDserver DDI
 
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/cert-manager-webhook-solidserver)](https://artifacthub.io/packages/search?repo=cert-manager-webhook-solidserver)
+
+---
+
 A cert-manager ACME DNS-01 webhook solver that manages the full lifecycle of TXT validation records via the EfficientIP SOLIDserver REST API.
 
 Based on [cert-manager/webhook-example](https://github.com/cert-manager/webhook-example).
