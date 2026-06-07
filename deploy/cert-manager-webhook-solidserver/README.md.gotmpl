@@ -1,0 +1,112 @@
+{{ template "chart.header" . }}
+{{ template "chart.deprecationWarning" . }}
+
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.homepageLine" . }}
+
+{{ template "chart.maintainersSection" . }}
+
+{{ template "chart.sourcesSection" . }}
+
+## Installation
+
+The webhook must be deployed in the same namespace as cert-manager.
+
+```bash
+helm repo add solidserver-webhook https://niklas-letz.github.io/cert-manager-webhook-solidserver
+helm install solidserver-webhook solidserver-webhook/cert-manager-webhook-solidserver \
+  --version <version> \
+  --namespace cert-manager
+```
+
+{{ template "chart.requirementsSection" . }}
+
+{{ template "chart.valuesSection" . }}
+
+## Usage
+
+### Issuer / ClusterIssuer
+
+Create an `Issuer` or `ClusterIssuer` resource with the SOLIDserver webhook solver:
+
+```yaml
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: mail@example.com
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    solvers:
+      - dns01:
+          webhook:
+            groupName: acme.solidserver.niklasletz.dev
+            solverName: solidserver
+            config:
+              host: sds.example.com
+              serverName: dns.example.com
+              zoneName: test.example.com
+              usernameSecretRef:
+                name: solidserver-credentials
+                key: username
+              passwordSecretRef:
+                name: solidserver-credentials
+                key: password
+```
+
+**Note:** The example uses Let's Encrypt's **staging** environment. Once your setup works, switch to production by changing the `server` field to `https://acme-v02.api.letsencrypt.org/directory`.
+
+### Config fields
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `host` | yes | SOLIDserver hostname or IP |
+| `port` | no | API port (defaults to `443`) |
+| `serverName` | yes | DNS server name configured in SOLIDserver |
+| `zoneName` | no | DNS zone name (defaults to the resolved ACME zone) |
+| `viewName` | no | DNS view name |
+| `username` / `password` | no | Inline credentials (not recommended for production) |
+| `usernameSecretRef` / `passwordSecretRef` | no | Kubernetes Secret references for credentials |
+
+### Credentials
+
+Credentials can be provided inline or via a Kubernetes Secret. Using a Secret is recommended for production:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: solidserver-credentials
+  namespace: cert-manager
+type: Opaque
+data:
+  username: <base64-encoded-username>
+  password: <base64-encoded-password>
+```
+
+The default keys are `username` and `password` — override with the `key` field in `usernameSecretRef` / `passwordSecretRef` if different.
+
+### Certificate
+
+```yaml
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: example-cert
+  namespace: cert-manager
+spec:
+  dnsNames:
+    - example.com
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  secretName: example-cert
+```
+
+{{ template "helm-docs.versionFooter" . }}
