@@ -64,11 +64,11 @@ func (cfg *solidserverDNSProviderConfig) zoneNameOrDefault(resolvedZone string) 
 
 var sdsHTTPClient = &http.Client{
 	Transport: &http.Transport{
-		MaxIdleConns:        10,
-		MaxIdleConnsPerHost: 5,
+		MaxIdleConns:        100,
+		MaxIdleConnsPerHost: 20,
 		IdleConnTimeout:     90 * time.Second,
 	},
-	Timeout: 30 * time.Second,
+	Timeout: 25 * time.Second,
 }
 
 func (s *solidserverDNSProviderSolver) Present(ch *v1alpha1.ChallengeRequest) error {
@@ -161,7 +161,7 @@ func newAPIClient(cfg solidserverDNSProviderConfig, username, password string) (
 	sdsCfg.Servers[0].Variables["host"] = sdsclient.ServerVariable{DefaultValue: cfg.Host}
 	sdsCfg.Servers[0].Variables["port"] = sdsclient.ServerVariable{DefaultValue: fmt.Sprintf("%d", cfg.Port)}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 25*time.Second)
 	ctx = context.WithValue(ctx, sdsclient.ContextBasicAuth, sdsclient.BasicAuth{
 		UserName: username,
 		Password: password,
