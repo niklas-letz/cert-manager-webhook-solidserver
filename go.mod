@@ -3,7 +3,7 @@ module github.com/niklas-letz/cert-manager-webhook-solidserver
 go 1.26.0
 
 require (
-	github.com/cert-manager/cert-manager v1.20.2
+	github.com/cert-manager/cert-manager v1.20.3
 	github.com/efficientip-labs/solidserver-go-client v1.8.4
 	k8s.io/apiextensions-apiserver v0.35.4
 	k8s.io/apimachinery v0.35.4
